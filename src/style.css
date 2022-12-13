@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply min-h-full;
+        @apply bg-whowflower-black;
+        @apply text-white
+    }
+}
