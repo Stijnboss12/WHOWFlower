@@ -1,4 +1,5 @@
-#Project Setup
+Project Setup
+
 Download the project, if necessary extract the files into a folder.
 Open a command prompt in the folder the files were extracted to.
 
