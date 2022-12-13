@@ -24,6 +24,8 @@ import TheWelcome from "./components/TheWelcome.vue";
 </template>
 
 <style scoped>
+</style>
+<style scoped>
 header {
   line-height: 1.5;
 }
