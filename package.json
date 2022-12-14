@@ -9,6 +9,9 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.1.0",
+    "@tensorflow/tfjs-converter": "^4.1.0",
+    "@tensorflow/tfjs-node": "^4.1.0",
     "vue": "^3.2.45"
   },
   "devDependencies": {
