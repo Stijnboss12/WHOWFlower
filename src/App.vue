@@ -58,7 +58,7 @@
         <div id="uploadImageDiv" class="flex-1 flex-col items-center lg:items-start hidden">
           <div class="flex justify-center items-center flex-wrap flex-col">
             <label class="text-center">{{ predictedLabel }}</label>
-            <img id="img" src="" class=" max-h-[200px] max-w-[100px] mt-5 border-whowflower-limegreen border-4 rounded-md " />
+            <img id="img" src="" class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " />
           </div>
         </div>
         <!-- Image upload moet hier -->
@@ -109,8 +109,8 @@ export default {
       uploadImageDiv.classList.add("flex");
 
       let img = document.getElementById("img");
-      img.setAttribute("height", 200)
-      img.setAttribute("width", 100)
+      // img.setAttribute("height", 200)
+      // img.setAttribute("width", 100)
 
       let filereader = new FileReader();
 
@@ -123,13 +123,25 @@ export default {
         imgTemp = e.target.result
         console.log(img)
 
-        const a = tf.browser.fromPixels(img, 4)
+        const a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200])
+
+
+
+
+
+        // let fix = tf.concat(resized, 0)
+        // console.log(fix)
+        a.shape.unshift(1)
+        // a.reshape([null, 120, 120, 3])
         a.print()
         console.log(a)
-        a.shape.unshift(null)
-        console.log(a.shape)
-        test.predict(a)
+        let result = test.predict(a)
+        console.log(result.argMax([-1]))
 
+        // console.log(result)
+        
+
+  
       };
 
 
@@ -137,7 +149,6 @@ export default {
       // console.log(input.files[0])
 
       let temp = filereader.readAsDataURL(input.files[0]);
-
 
 
       // im.onload = () => {
