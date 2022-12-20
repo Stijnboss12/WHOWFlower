@@ -27,9 +27,6 @@
             A simple platform to find out WHAT plant or flower you are looking
             at and learn HOW to care for it.
           </p>
-          <div class="flex justify-center flex-wrap gap-6">
-            <Button btnText="Sign up" class="bg-whowflower-darkgreen text-white hover:bg-white"></Button>
-          </div>
         </div>
         <!-- Image -->
         <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0">
@@ -57,7 +54,7 @@
         ">
         <div id="uploadImageDiv" class="flex-1 flex-col items-center lg:items-start hidden">
           <div class="flex justify-center items-center flex-wrap flex-col">
-            <label class="text-center">{{ predictedLabel }}</label>
+            <label class="text-center" id="labeltoupdate">Dit is een {{ predictedLabel }}</label>
             <img id="img" src="" class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " />
           </div>
         </div>
@@ -76,10 +73,12 @@
 
 <script>
 import * as tf from '@tensorflow/tfjs';
+import { range } from '@tensorflow/tfjs';
 let test;
+
 export default {
   data() {
-    return { predictedLabel: "", model_plant: "" }
+    return { predictedLabel: "sssss", model_plant: "" }
   },
   async beforeCreate() {
 
@@ -91,11 +90,14 @@ export default {
     // })
   },
   methods: {
+    updateVariable(temp){
+        this.predictedLabel = temp
+      },
     onImageUpload() {
       // add file chec
-
-      this.readURL()
-
+      for (let i = 0; i < 2; i++) {
+        this.readURL()
+      }
     },
     readURL() {
       let input = document.getElementById("fileinput");
@@ -116,14 +118,15 @@ export default {
 
       let imgTemp = undefined
 
+      var classification_label = ""
+
       // console.log(this.model_plant.summary())
       filereader.onload = function (e) {
         console.log('on load')
         img.src = e.target.result;
-        imgTemp = e.target.result
-        // console.log(img)
+        console.log(img)
 
-        const a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
+        let a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
         // console.log(a)
 
 
@@ -132,25 +135,36 @@ export default {
         // console.log(fix)
         a.shape.unshift(1)
         // a.reshape([null, 120, 120, 3])
+        console.log('image array below')
         a.print()
         // console.log(a)
         let result = test.predict(a)
-        console.log("result below kuts")
+        console.log("result below")
         let temp = result.dataSync()
 
-        console.log(temp);
-        
+        const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
 
-        
-        
+        const maxIndex = temp.indexOf(Math.max(...temp));
 
-        // console.log(result)
-        
+        // Look up the corresponding label in the labels array
+        const label = labels[maxIndex];
+
+        console.log(label);  // Output: 'classifier1'
+        updateVariable(label)
 
   
+
+
+
+        // console.log(result)
+
+
+
       };
 
 
+      this.predictedLabel = classification_label
+      console.log(classification_label)
       // this.model_plant.predict(input.files[0])
       // console.log(input.files[0])
 
@@ -162,6 +176,7 @@ export default {
       //   a.print()
       //   console.log(a.shape)
       // }
+
 
     },
   },
