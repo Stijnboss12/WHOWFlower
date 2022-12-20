@@ -116,16 +116,15 @@ export default {
 
       let imgTemp = undefined
 
-      console.log(this.model_plant.summary())
+      // console.log(this.model_plant.summary())
       filereader.onload = function (e) {
         console.log('on load')
         img.src = e.target.result;
         imgTemp = e.target.result
-        console.log(img)
+        // console.log(img)
 
-        const a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200])
-
-
+        const a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
+        // console.log(a)
 
 
 
@@ -134,9 +133,16 @@ export default {
         a.shape.unshift(1)
         // a.reshape([null, 120, 120, 3])
         a.print()
-        console.log(a)
+        // console.log(a)
         let result = test.predict(a)
-        console.log(result.argMax([-1]))
+        console.log("result below kuts")
+        let temp = result.dataSync()
+
+        console.log(temp);
+        
+
+        
+        
 
         // console.log(result)
         
