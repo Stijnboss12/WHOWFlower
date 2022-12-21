@@ -36,7 +36,7 @@
               sm:w-3/4 sm:h-3/4
               md:w-5/6 md:h-5/6
               lg:w-full lg:h-full
-            " src="./assets/flower.png" style="border-radius: 130px" />
+            " src="./assets/flower.png" style="border-radius: 130px"/>
         </div>
         <div></div>
       </div>
@@ -55,7 +55,7 @@
         <div id="uploadImageDiv" class="flex-1 flex-col items-center lg:items-start hidden">
           <div class="flex justify-center items-center flex-wrap flex-col">
             <label class="text-center" id="labeltoupdate">Dit is een {{ predictedLabel }}</label>
-            <img id="img" src="" class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " />
+            <img id="img" src="./assets/flower.png" class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md "  height="120" width="200"/>
           </div>
         </div>
         <!-- Image upload moet hier -->
@@ -78,7 +78,7 @@ let test;
 
 export default {
   data() {
-    return { predictedLabel: "sssss", model_plant: "" }
+    return { predictedLabel: "Loading", model_plant: "", first: false }
   },
   async beforeCreate() {
 
@@ -92,12 +92,11 @@ export default {
   methods: {
     onImageUpload() {
       this.readURL()
-      // add file chec
-      // for (let i = 0; i < 2; i++) {
-      //   this.readURL().then((result) => {
-      //     console.log('result')
-      //   })
-      // }
+      for (let i = 0; i < 2; i++) {
+        this.readURL().then((result) => {
+          console.log('result')
+        })
+      }
     },
     async readURL() {
       let input = document.getElementById("fileinput");
@@ -107,18 +106,19 @@ export default {
       }
 
       let uploadImageDiv = document.getElementById("uploadImageDiv");
-      uploadImageDiv.classList.remove("hidden");
-      uploadImageDiv.classList.add("flex");
+
 
       let img = document.getElementById("img");
-      console.log(img.src)
+      let naturalHeight = img.naturalHeight
+      let naturalWidth = img.naturalWidth
 
+      img.setAttribute('height', 120)
+      img.setAttribute('width', 200)
 
       let filereader = new FileReader();
-
       
       console.log("Above promise")
-      const imgResult = new Promise((resolve, reject) => {
+      const imgResult = new Promise((resolve) => {
         console.log("withing promise")
         filereader.onload = function(e) {
           resolve(e.target.result)
@@ -126,17 +126,16 @@ export default {
         }
       })
       
-      console.log("Under promise")
       filereader.readAsDataURL(input.files[0]);
+      console.log("Under promise")   
 
-      await imgResult;
-
-      img.src = imgResult
+      img.src = await imgResult
 
       console.log(imgResult)
 
 
       console.log("above from pixels")
+      console.log(img)
       let tensorImage = await tf.browser.fromPixels(img, 3)
       console.log("above resize")
 
@@ -148,14 +147,15 @@ export default {
       await normalizedImage.shape.unshift(1)
 
       // predict
-
-      let pred = test.predict(tensorImage)
+      console.log('NORMASODMOASDMASD')
+      normalizedImage.print()
+      let pred = test.predict(normalizedImage)
       console.log("Predicition result")
       let predResult = await pred.data()
 
       const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
 
-      const maxIndex = temp.indexOf(Math.max(...temp));
+      const maxIndex = predResult.indexOf(Math.max(...predResult));
 
       const label = labels[maxIndex];
 
@@ -163,65 +163,12 @@ export default {
 
       this.predictedLabel = label;
 
+      img.setAttribute('height', naturalHeight)
+      img.setAttribute('width', naturalWidth)
 
-      // console.log(this.model_plant.summary())
-      // filereader.onload = function (e) {
-      //   console.log('on load')
-      //   img.src = e.target.result;
-      //   console.log(img)
-
-      //   let a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
-      //   // console.log(a)
-
-
-
-      //   // let fix = tf.concat(resized, 0)
-      //   // console.log(fix)
-      //   a.shape.unshift(1)
-      //   // a.reshape([null, 120, 120, 3])
-      //   console.log('image array below')
-      //   a.print()
-      //   // console.log(a)
-      //   let result = test.predict(a)
-      //   console.log("result below")
-      //   let temp = result.dataSync()
-
-      //   const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
-
-      //   const maxIndex = temp.indexOf(Math.max(...temp));
-
-      //   // Look up the corresponding label in the labels array
-      //   const label = labels[maxIndex];
-
-      //   console.log(label);  // Output: 'classifier1'
-      //   updateVariable(label)
-
-  
-
-
-
-      //   // console.log(result)
-
-
-
-      // };
-
-
-      // this.predictedLabel = classification_label
-      // console.log(classification_label)
-      // // this.model_plant.predict(input.files[0])
-      // // console.log(input.files[0])
-
-      // let temp = filereader.readAsDataURL(input.files[0]);
-
-
-      // im.onload = () => {
-      //   const a = tf.browser.fromPixels(im, 4)
-      //   a.print()
-      //   console.log(a.shape)
-      // }
-
-
+      
+      uploadImageDiv.classList.add("flex");
+      uploadImageDiv.classList.remove("hidden");
     },
   },
 }
