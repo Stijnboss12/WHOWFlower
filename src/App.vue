@@ -90,16 +90,16 @@ export default {
     // })
   },
   methods: {
-    updateVariable(temp){
-        this.predictedLabel = temp
-      },
     onImageUpload() {
+      this.readURL()
       // add file chec
-      for (let i = 0; i < 2; i++) {
-        this.readURL()
-      }
+      // for (let i = 0; i < 2; i++) {
+      //   this.readURL().then((result) => {
+      //     console.log('result')
+      //   })
+      // }
     },
-    readURL() {
+    async readURL() {
       let input = document.getElementById("fileinput");
 
       if (input.files.length < 0) {
@@ -111,64 +111,108 @@ export default {
       uploadImageDiv.classList.add("flex");
 
       let img = document.getElementById("img");
-      // img.setAttribute("height", 200)
-      // img.setAttribute("width", 100)
+      console.log(img.src)
+
 
       let filereader = new FileReader();
 
-      let imgTemp = undefined
+      
+      console.log("Above promise")
+      const imgResult = new Promise((resolve, reject) => {
+        console.log("withing promise")
+        filereader.onload = function(e) {
+          resolve(e.target.result)
+          console.log("Promise resolved")
+        }
+      })
+      
+      console.log("Under promise")
+      filereader.readAsDataURL(input.files[0]);
 
-      var classification_label = ""
+      await imgResult;
+
+      img.src = imgResult
+
+      console.log(imgResult)
+
+
+      console.log("above from pixels")
+      let tensorImage = await tf.browser.fromPixels(img, 3)
+      console.log("above resize")
+
+      let resizedImage = await tensorImage.resizeBilinear([120, 200])
+      console.log("above normalize")
+
+      let normalizedImage = await resizedImage.div(tf.scalar(255))
+
+      await normalizedImage.shape.unshift(1)
+
+      // predict
+
+      let pred = test.predict(tensorImage)
+      console.log("Predicition result")
+      let predResult = await pred.data()
+
+      const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+
+      const maxIndex = temp.indexOf(Math.max(...temp));
+
+      const label = labels[maxIndex];
+
+      console.log(label)
+
+      this.predictedLabel = label;
+
 
       // console.log(this.model_plant.summary())
-      filereader.onload = function (e) {
-        console.log('on load')
-        img.src = e.target.result;
-        console.log(img)
+      // filereader.onload = function (e) {
+      //   console.log('on load')
+      //   img.src = e.target.result;
+      //   console.log(img)
 
-        let a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
-        // console.log(a)
+      //   let a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
+      //   // console.log(a)
 
 
 
-        // let fix = tf.concat(resized, 0)
-        // console.log(fix)
-        a.shape.unshift(1)
-        // a.reshape([null, 120, 120, 3])
-        console.log('image array below')
-        a.print()
-        // console.log(a)
-        let result = test.predict(a)
-        console.log("result below")
-        let temp = result.dataSync()
+      //   // let fix = tf.concat(resized, 0)
+      //   // console.log(fix)
+      //   a.shape.unshift(1)
+      //   // a.reshape([null, 120, 120, 3])
+      //   console.log('image array below')
+      //   a.print()
+      //   // console.log(a)
+      //   let result = test.predict(a)
+      //   console.log("result below")
+      //   let temp = result.dataSync()
 
-        const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+      //   const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
 
-        const maxIndex = temp.indexOf(Math.max(...temp));
+      //   const maxIndex = temp.indexOf(Math.max(...temp));
 
-        // Look up the corresponding label in the labels array
-        const label = labels[maxIndex];
+      //   // Look up the corresponding label in the labels array
+      //   const label = labels[maxIndex];
 
-        console.log(label);  // Output: 'classifier1'
-        updateVariable(label)
+      //   console.log(label);  // Output: 'classifier1'
+      //   updateVariable(label)
 
   
 
 
 
-        // console.log(result)
+      //   // console.log(result)
 
 
 
-      };
+      // };
 
 
-      this.predictedLabel = classification_label
-      console.log(classification_label)
-      // this.model_plant.predict(input.files[0])
-      // console.log(input.files[0])
+      // this.predictedLabel = classification_label
+      // console.log(classification_label)
+      // // this.model_plant.predict(input.files[0])
+      // // console.log(input.files[0])
 
-      let temp = filereader.readAsDataURL(input.files[0]);
+      // let temp = filereader.readAsDataURL(input.files[0]);
 
 
       // im.onload = () => {
