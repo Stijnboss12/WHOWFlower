@@ -27,9 +27,6 @@
             A simple platform to find out WHAT plant or flower you are looking
             at and learn HOW to care for it.
           </p>
-          <div class="flex justify-center flex-wrap gap-6">
-            <Button btnText="Sign up" class="bg-whowflower-darkgreen text-white hover:bg-white"></Button>
-          </div>
         </div>
         <!-- Image -->
         <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0">
@@ -57,8 +54,9 @@
         ">
         <div id="uploadImageDiv" class="flex-1 flex-col items-center lg:items-start hidden">
           <div class="flex justify-center items-center flex-wrap flex-col">
-            <label class="text-center">{{ predictedLabel }}</label>
-            <img id="img" src="" class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " />
+            <label class="text-center" id="labeltoupdate">Dit is een {{ predictedLabel }}</label>
+            <img id="img" src="./assets/flower.png"
+              class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " height="120" width="200" />
           </div>
         </div>
         <!-- Image upload moet hier -->
@@ -67,7 +65,14 @@
           <label for="fileinput" id="labelInput"
             class="bg-whowflower-darkgreen overflow-hidden w-1/2 py-2 text-center rounded-md shadow-md text-white lg:text-left">
             <p class="text-center text-2xl"> Upload your image here</p>
+
           </label>
+          <form class="justify-center items-center flex-1 flex-row mt-5">
+            <label for="flowerInput" class="mx-5">Flower</label>
+            <input id="flowerInput" type="radio" name="flowerorplant" value="flower" />
+            <label for="plantInput" class="mx-5">Plant</label>
+            <input id="plantInput" type="radio" name="flowerorplant" value="Plant" />
+          </form>
         </div>
       </div>
     </section>
@@ -76,28 +81,43 @@
 
 <script>
 import * as tf from '@tensorflow/tfjs';
-let test;
+
+
 export default {
   data() {
-    return { predictedLabel: "", model_plant: "" }
+    return { predictedLabel: "Loading", model_flower: "", model_plant: "" }
   },
   async beforeCreate() {
 
 
-    test = this.model_plant = await tf.loadLayersModel('src/assets/models/tfjs_flower_model/model.json')
+    this.model_flower = await tf.loadLayersModel('src/assets/models/tfjs_flower_model/model.json')
+    this.model_plant = await tf.loadLayersModel('src/assets/models/tfjs_plant_model/model.json')
     // tf.loadLayersModel('src/assets/models/tfjs_flower_model/model.json').then((model) => {
-    //   this.model_plant = model;
-    // this.model_plant.summary();
+    //   this.model_flower = model;
+    // this.model_flower.summary();
     // })
   },
   methods: {
     onImageUpload() {
-      // add file chec
 
-      this.readURL()
+      let selected = document.querySelector('input[name="flowerorplant"]:checked').value;
 
+      if (selected == 'flower')
+        for (let i = 0; i < 2; i++) {
+          this.classifyImage(this.model_flower).then((result) => {
+            console.log('result')
+          })
+        }
+      else {
+        for (let i = 0; i < 2; i++) {
+          this.classifyImage(this.model_plant).then((result) => {
+            console.log('result')
+          })
+        }
+      }
     },
-    readURL() {
+    async classifyImage(model) {
+      console.log(model)
       let input = document.getElementById("fileinput");
 
       if (input.files.length < 0) {
@@ -105,64 +125,68 @@ export default {
       }
 
       let uploadImageDiv = document.getElementById("uploadImageDiv");
-      uploadImageDiv.classList.remove("hidden");
-      uploadImageDiv.classList.add("flex");
 
       let img = document.getElementById("img");
-      // img.setAttribute("height", 200)
-      // img.setAttribute("width", 100)
+      let naturalHeight = img.naturalHeight
+      let naturalWidth = img.naturalWidth
+
+      img.setAttribute('height', 120)
+      img.setAttribute('width', 200)
 
       let filereader = new FileReader();
 
-      let imgTemp = undefined
+      console.log("Above promise")
+      
+      const imgResult = new Promise((resolve) => {
+        console.log("withing promise")
+        filereader.onload = function (e) {
+          resolve(e.target.result)
+          console.log("Promise resolved")
+        }
+      })
 
-      // console.log(this.model_plant.summary())
-      filereader.onload = function (e) {
-        console.log('on load')
-        img.src = e.target.result;
-        imgTemp = e.target.result
-        // console.log(img)
+      filereader.readAsDataURL(input.files[0]);
+      console.log("Under promise")
 
-        const a = tf.browser.fromPixels(img, 3).resizeBilinear([120, 200]).div(tf.scalar(255))
-        // console.log(a)
+      img.src = await imgResult
+
+      console.log(imgResult)
+
+      console.log("above from pixels")
+      console.log(img)
+      let tensorImage = await tf.browser.fromPixels(img, 3)
+      console.log("above resize")
+
+      let resizedImage = await tensorImage.resizeBilinear([120, 200])
+      console.log("above normalize")
+
+      let normalizedImage = await resizedImage.div(tf.scalar(255))
+
+      await normalizedImage.shape.unshift(1)
+
+      // predict
+      console.log('NORMASODMOASDMASD')
+      normalizedImage.print()
+      let pred = model.predict(normalizedImage)
+      console.log("Predicition result")
+      let predResult = await pred.data()
+
+      const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+
+      const maxIndex = predResult.indexOf(Math.max(...predResult));
+
+      const label = labels[maxIndex];
+
+      console.log(label)
+
+      this.predictedLabel = label;
+
+      img.setAttribute('height', naturalHeight)
+      img.setAttribute('width', naturalWidth)
 
 
-
-        // let fix = tf.concat(resized, 0)
-        // console.log(fix)
-        a.shape.unshift(1)
-        // a.reshape([null, 120, 120, 3])
-        a.print()
-        // console.log(a)
-        let result = test.predict(a)
-        console.log("result below kuts")
-        let temp = result.dataSync()
-
-        console.log(temp);
-        
-
-        
-        
-
-        // console.log(result)
-        
-
-  
-      };
-
-
-      // this.model_plant.predict(input.files[0])
-      // console.log(input.files[0])
-
-      let temp = filereader.readAsDataURL(input.files[0]);
-
-
-      // im.onload = () => {
-      //   const a = tf.browser.fromPixels(im, 4)
-      //   a.print()
-      //   console.log(a.shape)
-      // }
-
+      uploadImageDiv.classList.add("flex");
+      uploadImageDiv.classList.remove("hidden");
     },
   },
 }
