@@ -38,7 +38,6 @@
               lg:w-full lg:h-full
             " src="./assets/flower.png" style="border-radius: 130px" />
         </div>
-        <div></div>
       </div>
     </section>
     <section class="relative">
@@ -68,17 +67,80 @@
         </div>
       </div>
     </section>
+    <section class="relative">
+      <div class="
+          container
+          flex flex-col-reverse
+          lg:flex-row-reverse
+          items-center
+          gap-12
+          mt-14
+          mb-14
+          lg:mt-28
+        ">
+        <div class="flex flex-1 flex-row items-center lg:items-start">
+          <div class="flex flex-1 flex-col m-6 items-start">
+            <h2 class="
+              text-5xl
+              md:text-4
+              lg:text-3xl
+              text-center
+              lg:text-left
+              mb-6
+              text-whowflower-limegreen
+            ">
+              This is how to care for your Plant or flower
+            </h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+              mollit anim id est laborum.</p>
+          </div>
+          <div class="flex flex-1 flex-col m-6 items-end">
+            <h2 class="
+              text-5xl
+              md:text-4
+              lg:text-3xl
+              text-center
+              lg:text-left
+              mb-6
+              text-whowflower-limegreen
+            ">
+              Do you have any specific questions? Ask them Here!
+            </h2>
+            <form class="flex flex-col w-11/12 items-end">
+              <input class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
+              <button class="bg-whowflower-darkgreen border-whowflower-limegreen border-2 mb-6 rounded-xl w-1/2">Click here to ask!</button>
+            </form>
+            <h2 class="
+              text-5xl
+              md:text-4
+              lg:text-2xl
+              text-center
+              lg:text-left
+              mb-6
+              text-whowflower-limegreen
+            ">
+              Your answer below...
+            </h2>
+            <p>Test antwoord</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
 </template>
 
 <script>
 import * as tf from '@tensorflow/tfjs';
 import { range } from '@tensorflow/tfjs';
+import axios from 'axios'
 let test;
 
 export default {
   data() {
-    return { predictedLabel: "sssss", model_plant: "" }
+    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: ""}
   },
   async beforeCreate() {
 
@@ -90,9 +152,12 @@ export default {
     // })
   },
   methods: {
-    updateVariable(temp){
-        this.predictedLabel = temp
-      },
+    updateVariable(temp) {
+      this.predictedLabel = temp
+    },
+    submitQuestion() {
+      
+    },
     onImageUpload() {
       // add file chec
       for (let i = 0; i < 2; i++) {
@@ -152,7 +217,7 @@ export default {
         console.log(label);  // Output: 'classifier1'
         updateVariable(label)
 
-  
+
 
 
 
