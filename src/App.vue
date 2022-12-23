@@ -99,11 +99,7 @@
             ">
               This is how to care for your Plant or flower
             </h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-              mollit anim id est laborum.</p>
+            <p>{{ careGuide }}</p>
           </div>
           <div class="flex flex-1 flex-col m-6 items-end">
             <h2 class="
@@ -119,7 +115,26 @@
             </h2>
             <form class="flex flex-col w-11/12 items-end">
               <input class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
-              <button class="bg-whowflower-darkgreen border-whowflower-limegreen border-2 mb-6 rounded-xl w-1/2">Click here to ask!</button>
+              <select class="w-full bg-whowflower-darkgreen px-5 py-1 rounded-xl border-whowflower-limegreen border-4">
+                <option value="daffodil">Daffodil</option>
+                <option value="dahlia">Dahlia</option>
+                <option value="daisy">Daisy</option>
+                <option value="dandelion">Dandelion</option>
+                <option value="gerbera">Gerbera</option>
+                <option value="lavender">Lavender</option>
+                <option value="rose">Rose</option>
+                <option value="tulip">Tulip</option>
+                <option value="alocasia">Alocasia</option>
+                <option value="cactus">Cactus</option>
+                <option value="calathea">Calathea</option>
+                <option value="english ivy">English Ivy</option>
+                <option value="fiddle leaf fig">Fiddle Leaf Fig</option>
+                <option value="monstera deliciousa">Monstera Deliciousa</option>
+                <option value="palm lily">Palm Lily</option>
+                <option value="polycias"></option>
+              </select>
+              <button class="bg-whowflower-darkgreen border-whowflower-limegreen border-2 mb-6 rounded-xl w-1/2 mt-5"
+                v-on:click="onSubmitQuestion()">Click here to ask!</button>
             </form>
             <h2 class="
               text-5xl
@@ -132,7 +147,7 @@
             ">
               Your answer below...
             </h2>
-            <p>Test antwoord</p>
+            <p>{{ answer }}</p>
           </div>
         </div>
       </div>
@@ -149,7 +164,7 @@ let test;
 
 export default {
   data() {
-    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: ""}
+    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: "" }
   },
   async beforeCreate() {
 
@@ -165,8 +180,8 @@ export default {
     updateVariable(temp) {
       this.predictedLabel = temp
     },
-    submitQuestion() {
-      
+    onSubmitQuestion() {
+
     },
     onImageUpload() {
 
@@ -174,19 +189,19 @@ export default {
 
       if (selected == 'flower')
         for (let i = 0; i < 2; i++) {
-          this.classifyImage(this.model_flower).then((result) => {
+          this.classifyImage(this.model_flower, "flower").then((result) => {
             console.log('result')
           })
         }
       else {
         for (let i = 0; i < 2; i++) {
-          this.classifyImage(this.model_plant).then((result) => {
+          this.classifyImage(this.model_plant, "plant").then((result) => {
             console.log('result')
           })
         }
       }
     },
-    async classifyImage(model) {
+    async classifyImage(model, type) {
       console.log(model)
       let input = document.getElementById("fileinput");
 
@@ -206,7 +221,7 @@ export default {
       let filereader = new FileReader();
 
       console.log("Above promise")
-      
+
       const imgResult = new Promise((resolve) => {
         console.log("withing promise")
         filereader.onload = function (e) {
@@ -235,23 +250,27 @@ export default {
       await normalizedImage.shape.unshift(1)
 
       // predict
-      console.log('NORMASODMOASDMASD')
       normalizedImage.print()
       let pred = model.predict(normalizedImage)
       console.log("Predicition result")
       let predResult = await pred.data()
 
-      const labels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+      const flowerLabels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+      const plantLabels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
 
       const maxIndex = predResult.indexOf(Math.max(...predResult));
 
+      let label;
+      if (type == "flower") {
+        label = flowerLabels[maxIndex];
+      } else {
+        label = plantLabels[maxIndex];
+      }
 
-      console.log(label)
+      this.predictedLabel = label
 
-      this.predictedLabel = label;
-
-
-        // console.log(result)
+      img.setAttribute('height', naturalHeight)
+      img.setAttribute('width', naturalWidth)
 
 
       uploadImageDiv.classList.add("flex");
