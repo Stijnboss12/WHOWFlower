@@ -75,7 +75,7 @@
         </div>
       </div>
     </section>
-    <section class="relative">
+    <section class="relative bg-whowflower-black-800 py-10">
       <div class="
           container
           flex flex-col-reverse
