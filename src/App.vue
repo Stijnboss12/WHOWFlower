@@ -113,9 +113,11 @@
             ">
               Do you have any specific questions? Ask them Here!
             </h2>
-            <div class="flex flex-col w-11/12 items-end" >
-              <input v-model="question"  class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
-              <select v-model="selectedFlower" class="w-full bg-whowflower-darkgreen px-5 py-1 rounded-xl border-whowflower-limegreen border-4 ">
+            <div class="flex flex-col w-11/12 items-end">
+              <input v-model="question"
+                class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
+              <select v-model="selectedFlower"
+                class="w-full bg-whowflower-darkgreen px-5 py-1 rounded-xl border-whowflower-limegreen border-4 ">
                 <option value="daffodil">Daffodil</option>
                 <option value="dahlia">Dahlia</option>
                 <option value="daisy">Daisy</option>
@@ -164,7 +166,7 @@ const api_url = "http://127.0.0.1:5000/api/"
 
 export default {
   data() {
-    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: "", selectedFlower: "" }
+    return { predictedLabel: "Loading...", careGuide: "", question: "", answer: "", selectedFlower: "" }
   },
   async beforeCreate() {
 
@@ -188,10 +190,10 @@ export default {
       this.careGuide = response.data
     },
     async onSubmitQuestion() {
-        this.answer = "Loading..."
-        const response = await axios.get(`${api_url}/question?plant_name=${this.selectedFlower}&question=${this.question}`)
-        this.answer = response.data
-        
+      this.answer = "Loading..."
+      const response = await axios.get(`${api_url}/question?plant_name=${this.selectedFlower}&question=${this.question}`)
+      this.answer = response.data
+
     },
     onImageUpload() {
 
@@ -212,10 +214,14 @@ export default {
         }
       else {
         for (let i = 0; i < 2; i++) {
-          if (i > 1) {
-            break;
-          }
+          console.log(i)
           this.classifyImage(this.model_plant, "plant").then((result) => {
+            console.log("Classify resolved")
+            if (i >= 1) {
+              this.getCareGuide(result).then((careguide) => {
+                console.log("Careguide resolved")
+              })
+            }
             console.log('result')
           })
         }
