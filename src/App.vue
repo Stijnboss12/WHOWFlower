@@ -53,7 +53,7 @@
         ">
         <div id="uploadImageDiv" class="flex-1 flex-col items-center lg:items-start hidden">
           <div class="flex justify-center items-center flex-wrap flex-col">
-            <label class="text-center" id="labeltoupdate">Dit is een {{ predictedLabel }}</label>
+            <label class="text-center" id="labeltoupdate">(please allow for up to 1 minute to load the correct classification) <br> This is a {{ predictedLabel }}</label>
             <img id="img" src="./assets/flower.png"
               class=" h-3/4 w-3/4 mt-5 border-whowflower-limegreen border-4 rounded-md " height="120" width="200" />
           </div>
@@ -282,7 +282,7 @@ export default {
       let predResult = await pred.data()
 
       const flowerLabels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
-      const plantLabels = ['Alocasia', 'Cactus', 'Calathea', 'English Ivy', 'Fiddle Leaf Fig', 'Monstera Deliciousa', 'Palm Lily', 'polycias']
+      const plantLabels = ['Alocasia', 'Cactus', 'Calathea', 'English Ivy', 'Fiddle Leaf Fig', 'Monstera Deliciousa', 'Palm Lily', 'Polycias']
 
       const maxIndex = predResult.indexOf(Math.max(...predResult));
 
