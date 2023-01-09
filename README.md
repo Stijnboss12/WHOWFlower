@@ -1,13 +1,13 @@
-Project Setup
+# Get started
+This get started page will guide you into getting the project up and running.
+## Requirements
+ - Python 3.10.x
+ - NodeJS 16.x.x
+ 
+## Setup
+1. Clone the respository.
+2. Run `npm install`
+3. Install the following python dependencies: `flask` `flask_cors` `numpy` `pandas` `transformers`. 
+4. Run `npm run dev` to run the development server
+5. Run `python pyapi.py`
 
-Download the project, if necessary extract the files into a folder.
-Open a command prompt in the folder the files were extracted to.
-
-Run the following commands. Note: Node.js (latest) and npm (latest) have to be installed on your system.
-
->npm install
-
->npm run dev
-
-The application is now hosted locally on your computer.
-Click or copy the link in your command prompt window to open the application.
