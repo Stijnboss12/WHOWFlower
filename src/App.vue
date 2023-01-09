@@ -113,9 +113,9 @@
             ">
               Do you have any specific questions? Ask them Here!
             </h2>
-            <form class="flex flex-col w-11/12 items-end">
-              <input class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
-              <select class="w-full bg-whowflower-darkgreen px-5 py-1 rounded-xl border-whowflower-limegreen border-4">
+            <div class="flex flex-col w-11/12 items-end" >
+              <input v-model="question"  class="bg-whowflower-darkgreen rounded-xl border-whowflower-limegreen w-full border-2 mb-6" />
+              <select v-model="selectedFlower" class="w-full bg-whowflower-darkgreen px-5 py-1 rounded-xl border-whowflower-limegreen border-4 ">
                 <option value="daffodil">Daffodil</option>
                 <option value="dahlia">Dahlia</option>
                 <option value="daisy">Daisy</option>
@@ -131,11 +131,11 @@
                 <option value="fiddle leaf fig">Fiddle Leaf Fig</option>
                 <option value="monstera deliciousa">Monstera Deliciousa</option>
                 <option value="palm lily">Palm Lily</option>
-                <option value="polycias"></option>
+                <option value="polycias">Polycias</option>
               </select>
               <button class="bg-whowflower-darkgreen border-whowflower-limegreen border-2 mb-6 rounded-xl w-1/2 mt-5"
                 v-on:click="onSubmitQuestion()">Click here to ask!</button>
-            </form>
+            </div>
             <h2 class="
               text-5xl
               md:text-4
@@ -159,12 +159,12 @@
 import * as tf from '@tensorflow/tfjs';
 import { range } from '@tensorflow/tfjs';
 import axios from 'axios'
-let test;
+const api_url = "http://127.0.0.1:5000/api/"
 
 
 export default {
   data() {
-    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: "" }
+    return { predictedLabel: "Loading...", model_plant: "", careGuide: "", question: "", answer: "", selectedFlower: "" }
   },
   async beforeCreate() {
 
@@ -180,8 +180,18 @@ export default {
     updateVariable(temp) {
       this.predictedLabel = temp
     },
-    onSubmitQuestion() {
+    async getCareGuide(label) {
 
+      this.careGuide = "Loading..."
+      const response = await axios.get(`${api_url}summarize?plant_name=${label.toLowerCase()}`)
+
+      this.careGuide = response.data
+    },
+    async onSubmitQuestion() {
+        this.answer = "Loading..."
+        const response = await axios.get(`${api_url}/question?plant_name=${this.selectedFlower}&question=${this.question}`)
+        this.answer = response.data
+        
     },
     onImageUpload() {
 
@@ -189,12 +199,22 @@ export default {
 
       if (selected == 'flower')
         for (let i = 0; i < 2; i++) {
+          console.log(i)
           this.classifyImage(this.model_flower, "flower").then((result) => {
+            console.log("Classify resolved")
+            if (i >= 1) {
+              this.getCareGuide(result).then((careguide) => {
+                console.log("Careguide resolved")
+              })
+            }
             console.log('result')
           })
         }
       else {
         for (let i = 0; i < 2; i++) {
+          if (i > 1) {
+            break;
+          }
           this.classifyImage(this.model_plant, "plant").then((result) => {
             console.log('result')
           })
@@ -256,7 +276,7 @@ export default {
       let predResult = await pred.data()
 
       const flowerLabels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
-      const plantLabels = ['Daffodil', 'Dahlia', 'Daisy', 'Dandelion', 'Gerbera', 'Lavender', 'Rose', 'Tulip']
+      const plantLabels = ['Alocasia', 'Cactus', 'Calathea', 'English Ivy', 'Fiddle Leaf Fig', 'Monstera Deliciousa', 'Palm Lily', 'polycias']
 
       const maxIndex = predResult.indexOf(Math.max(...predResult));
 
@@ -275,6 +295,10 @@ export default {
 
       uploadImageDiv.classList.add("flex");
       uploadImageDiv.classList.remove("hidden");
+
+
+      return label;
+
     },
   },
 }

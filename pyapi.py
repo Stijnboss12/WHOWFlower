@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 import numpy as np
 import pandas as pd
 import os
@@ -6,6 +7,7 @@ import os
 from transformers import AutoTokenizer
 from transformers import pipeline
 from transformers import TFAutoModelForQuestionAnswering
+
 
 summarizer_model_name = "facebook/bart-large-cnn"
 summarizer = pipeline("summarization", model=summarizer_model_name)
@@ -17,6 +19,12 @@ tokenizer = AutoTokenizer.from_pretrained(question_answering_model_name)
 
 qa = pipeline("question-answering", model=qa_model, tokenizer=tokenizer)
 app = Flask(__name__)
+CORS(app)
+cors = CORS(app, resource={
+    r"/*":{
+        "origins":"*"
+    }
+})
 
 guidesfile = pd.read_excel('./data/Flower_and_Plant_Care_Data.xlsx')
 
@@ -58,7 +66,6 @@ def question():
         return 'plant not found ', 404
 
     row = guidesfile.loc[guidesfile['Name'] == plant_name]
-
 
     question_input = {
         "question": question,
