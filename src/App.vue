@@ -60,6 +60,7 @@
         </div>
         <!-- Image upload moet hier -->
         <div class="flex justify-center items-center flex-1 flex-col mb-10 md:mb-16 lg:mb-0">
+          <p class="text-whowflower-limegreen text-xl">It might take up to a minute to load the image.</p>
           <input class="rounded-xl h-0  text-lg mt-5" type="file" id="fileinput" @change="onImageUpload()" />
           <label for="fileinput" id="labelInput"
             class="bg-whowflower-darkgreen overflow-hidden w-1/2 py-2 text-center rounded-md shadow-md text-white lg:text-left">
